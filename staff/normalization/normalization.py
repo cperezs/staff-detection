@@ -3,6 +3,7 @@ from .preprocessing import invert_img
 
 __all__ = [
     'compute_paths',
+    'normalize',
     'draw_paths'
 ]
 
@@ -115,6 +116,28 @@ def compute_paths(img, invert=False):
         paths = np.append(paths, path)
     paths = np.reshape(paths, (5, -1))
     return paths
+
+def normalize(img, paths):
+    height, width = img.shape[:2]
+    new_img = img
+    npaths = paths.shape[0]
+    directions = np.zeros(npaths)
+    decision = int(0)
+    
+    for col in range(1, width):
+        directions += paths[:, col]-paths[:, col-1]
+        acc_dev = np.sum(directions)
+        current_decision = round(acc_dev/npaths)
+        directions -= current_decision
+        decision += int(current_decision)
+        if decision<=0:
+            new_img[0:abs(decision), col] = img[0, col]
+            new_img[decision:height, col] = img[0:height-decision, col]
+        else:
+            new_img[0:height-decision, col] = img[decision:height, col]
+            new_img[height-decision:height, col] = img[height-1, col]
+
+    return new_img
 
 def draw_paths(img, paths, line_height=1):
     img = np.copy(img)

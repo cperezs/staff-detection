@@ -7,6 +7,7 @@ __all__ = [
     'binarize_sauvola',
     'binarize_wolf',
     'compute_paths',
+    'normalize',
     'draw_paths',
     'isolate_lines'
 ]

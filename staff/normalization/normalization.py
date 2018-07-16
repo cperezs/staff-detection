@@ -2,9 +2,8 @@ import numpy as np
 from .preprocessing import invert_img
 
 __all__ = [
-    'compute_path',
-    'draw_paths',
-    'erase_path'
+    'compute_paths',
+    'draw_paths'
 ]
 
 # Computes staff's space and line height from a binary image
@@ -77,8 +76,9 @@ def _compute_costs(img):
     P[:, 0] = nodes
     return C, P
 
-def erase_path(img, path, line_height):
+def _erase_path(img, path):
     height, width = img.shape
+    space_height, line_height = _compute_heights(img)
     for x in range(0, width):
         for i in range(-int(line_height/2), int(line_height/2 + 1)):
             y = path[x] + i
@@ -91,34 +91,35 @@ def _trim_paths(paths, img):
     trimmed_paths = np.array([])
     for idx, path in enumerate(paths):
         line = img[path, x]
-        print(line)
+        #print(line)
         first = np.argmax(line == 0)
         last = np.argmax(line[::-1] == 0)
         print(x[first: last-1])
         #trimmed_paths.append(np.array((x[first: last+1], path[first: last+1])).T)
-        np.append(trimmed_paths, np.array((x[first: last+1], path[first: last+1])).T)
+        trimmed_paths = np.append(trimmed_paths, np.array((x[first: last+1], path[first: last+1])).T)
     return trimmed_paths
 
-def compute_path(img, invert=False):
+def compute_paths(img, invert=False):
     if invert:
         img = invert_img(img)
     # Convert image to array of ints (0's and 1's) to improve performance
     img = np.uint8(img / np.max(img))
     height, width = img.shape
-    # Computes costs from left to right and from right to left
-    C_lr, P_lr = _compute_costs(img)
-    C_rl, P_rl = _compute_costs(np.fliplr(img))
-    # Only the paths that start and end at the same points in both
-    #   directions are stable paths
-    start = P_lr[:, 0]
-    end = P_rl[P_lr[:, width-1], width-1]
-    stable_paths = np.argwhere(np.equal(start, end)).flatten()
-    return _trim_paths(P_lr[stable_paths], img)
+    paths = np.uint8([])
+    for i in range(0, 5):
+        # Computes costs from left to right
+        C_lr, P_lr = _compute_costs(img)
+        path_idx = np.argmin(C_lr[:, width-1])
+        path = P_lr[path_idx, :]
+        img = _erase_path(img, path)
+        paths = np.append(paths, path)
+    paths = np.reshape(paths, (5, -1))
+    return paths
 
 def draw_paths(img, paths, line_height=1):
     img = np.copy(img)
     height, width = img.shape[:2]
     x = np.array([np.arange(width, dtype=int)] * paths.shape[0]).flatten()
     for i in range(-int(line_height/2), int(line_height/2+1)):
-        img[paths.flatten().astype(int) + i, x] = [255, 0, 0]
+        img[paths.flatten().astype(int) + i, x.astype(int)] = [255, 0, 0]
     return img

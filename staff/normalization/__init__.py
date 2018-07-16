@@ -6,8 +6,7 @@ __all__ = [
     'binarize_otsu',
     'binarize_sauvola',
     'binarize_wolf',
-    'compute_path',
+    'compute_paths',
     'draw_paths',
-    'erase_path',
     'isolate_lines'
 ]

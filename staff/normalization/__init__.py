@@ -1,6 +1,7 @@
 from .binarization import *
 from .preprocessing import *
 from .normalization import *
+from .region_normalization import *
 
 __all__ = [
     'binarize_otsu',
@@ -9,5 +10,7 @@ __all__ = [
     'compute_paths',
     'normalize',
     'draw_paths',
-    'isolate_lines'
+    'isolate_lines',
+    'normalization_five_peaks',
+    
 ]

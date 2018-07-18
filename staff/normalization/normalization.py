@@ -132,7 +132,7 @@ def normalize(img, paths):
         decision += int(current_decision)
         if decision<=0:
             new_img[0:abs(decision), col] = img[0, col]
-            new_img[decision:height, col] = img[0:height-decision, col]
+            new_img[abs(decision):height, col] = img[0:height-abs(decision), col]
         else:
             new_img[0:height-decision, col] = img[decision:height, col]
             new_img[height-decision:height, col] = img[height-1, col]

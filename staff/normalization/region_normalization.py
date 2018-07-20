@@ -45,7 +45,7 @@ def normalization_five_peaks(image):
         for j in range(image.shape[1]):
             wHist[i] += (255. - gray_image[i][j])
     '''
-    wHist = 255. - np.sum(gray_image, axis=1)
+    wHist = np.sum(255. - gray_image, axis=1)
 
     #assert np.array_equiv(wHist, wHist2)
     

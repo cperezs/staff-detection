@@ -33,14 +33,21 @@ at the center of the image + x1.25 margin at each direction
 """
 def normalization_five_peaks(image):
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    print(image.shape)
+    print(gray_image.shape)
     
     # Histogram            
     wHist = np.zeros(image.shape[0])
+    print(wHist.shape)
     
+    '''
     for i in range(image.shape[0]):
         for j in range(image.shape[1]):
             wHist[i] += (255. - gray_image[i][j])
-    
+    '''
+    wHist = 255. - np.sum(gray_image, axis=1)
+
+    #assert np.array_equiv(wHist, wHist2)
     
     '''
     bar_width = 1
